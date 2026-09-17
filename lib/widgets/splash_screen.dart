@@ -60,8 +60,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
 
-    final double topPadding = screenHeight < 700 ? 25 : 65;
-    final double headerSpacing = screenHeight < 700 ? 35 : 80;
+    final double topPadding = screenHeight < 700 ? 25 : 55;
+    final double headerSpacing = screenHeight < 700 ? 35 : 65;
     final double inputToCardSpacing = screenHeight < 700 ? 30 : 55;
 
     return Scaffold(
@@ -99,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ],
               ),
 
-              const SizedBox(height: 5),
+              const SizedBox(height: 2),
 
               Text(
                 'Selamat datang di Quran App',
@@ -148,37 +148,24 @@ class _SplashScreenState extends State<SplashScreen> {
                     color: const Color(0xffFFFFFF),
                   ),
                   decoration: InputDecoration(
-                    hintText: isFocused ? '' : 'Masukan Username',
-                    prefixText: isFocused ? 'Nama : ' : null,
-                    prefixStyle: GoogleFonts.poppins(
-                      color: const Color(0xffFFFFFF),
-                      fontWeight: FontWeight.w600,
-                    ),
-                    fillColor: const Color(0xff040C23),
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 18,
-                      horizontal: 14,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(17),
-                      borderSide: const BorderSide(
-                        color: Color(0xff672CBC),
-                        width: 2.5,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(17),
-                      borderSide: const BorderSide(
-                        color: Color(0xff672CBC),
-                        width: 2.5,
-                      ),
-                    ),
-                    hintStyle: GoogleFonts.poppins(
-                      color: const Color(0xffFFFFFF),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                      hintText: isFocused ? "" : "Masukan Username",
+                      prefixText: isFocused ? "Nama : " : null,
+                      fillColor: const Color(0xff040C23),
+                      filled: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 18, horizontal: 14),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(17),
+                          borderSide: const BorderSide(
+                              color: Color(0xff672CBC), width: 2.5)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(17),
+                          borderSide: const BorderSide(
+                              color: Color(0xff672CBC), width: 2.5)),
+                      hintStyle: GoogleFonts.poppins(
+                        color: const Color(0xffFFFFFF),
+                        fontWeight: FontWeight.w600,
+                      )),
                 ),
               ),
 
@@ -188,61 +175,73 @@ class _SplashScreenState extends State<SplashScreen> {
               // QURAN ILLUSTRATION
               // =========================
               Expanded(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.topCenter,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 450,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: const Color(0xff672CBC),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
-                        child: Image.asset(
-                          'assets/splash.png',
-                          width: double.infinity,
-                          height: double.infinity,
-                          alignment: Alignment.bottomCenter,
-                        ),
-                      ),
-                    ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final double cardHeight = constraints.maxHeight < 450
+                        ? constraints.maxHeight
+                        : 450;
 
-                    // =========================
-                    // START BUTTON
-                    // =========================
-                    Positioned(
-                      top: -23,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: _startLearning,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 36,
-                              vertical: 14,
-                            ),
+                    return Align(
+                      alignment: Alignment.topCenter,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: cardHeight,
                             decoration: BoxDecoration(
-                              color: const Color(0xffF9B091),
                               borderRadius: BorderRadius.circular(30),
+                              color: const Color(0xff672CBC),
                             ),
-                            child: Text(
-                              'Mulai Belajar',
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xff091945),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(30),
+                              child: Image.asset(
+                                'assets/splash.png',
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.contain,
+                                alignment: Alignment.bottomCenter,
                               ),
                             ),
                           ),
-                        ),
+
+                          // =========================
+                          // START BUTTON
+                          // =========================
+                          Positioned(
+                            top: -23,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: _startLearning,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 36,
+                                    vertical: 14,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xffF9B091),
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: Text(
+                                    'Mulai Belajar',
+                                    style: GoogleFonts.poppins(
+                                      color: const Color(0xff643523),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 17,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],
