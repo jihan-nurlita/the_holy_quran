@@ -60,7 +60,6 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
 
-    // Responsif berdasarkan tinggi layar.
     final double topPadding = screenHeight < 700 ? 25 : 65;
     final double headerSpacing = screenHeight < 700 ? 35 : 80;
     final double inputToCardSpacing = screenHeight < 700 ? 30 : 55;
@@ -189,38 +188,36 @@ class _SplashScreenState extends State<SplashScreen> {
               // QURAN ILLUSTRATION
               // =========================
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.topCenter,
-                    children: [
-                      Positioned.fill(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            color: const Color(0xff672CBC),
-                          ),
-                          padding: const EdgeInsets.only(
-                            top: 38,
-                            bottom: 14,
-                            left: 12,
-                            right: 12,
-                          ),
-                          child: Image.asset(
-                            'assets/splash.png',
-                            width: double.infinity,
-                            height: double.infinity,
-                            alignment: Alignment.bottomCenter,
-                          ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.topCenter,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 450,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        color: const Color(0xff672CBC),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Image.asset(
+                          'assets/splash.png',
+                          width: double.infinity,
+                          height: double.infinity,
+                          alignment: Alignment.bottomCenter,
                         ),
                       ),
+                    ),
 
-                      // =========================
-                      // START BUTTON
-                      // =========================
-                      Positioned(
-                        top: -23,
+                    // =========================
+                    // START BUTTON
+                    // =========================
+                    Positioned(
+                      top: -23,
+                      left: 0,
+                      right: 0,
+                      child: Center(
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: _startLearning,
@@ -244,8 +241,8 @@ class _SplashScreenState extends State<SplashScreen> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],
