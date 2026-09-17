@@ -23,7 +23,8 @@ class LightPage extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding:
+            const EdgeInsets.only(top: 20, left: 24, right: 24, bottom: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -123,7 +124,7 @@ class LightPage extends StatelessWidget {
               subtitle: 'Atur font, tampilan, dan lainnya',
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 5),
 
             /// FOOTER
             Center(
@@ -137,7 +138,7 @@ class LightPage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 0),
           ],
         ),
       ),

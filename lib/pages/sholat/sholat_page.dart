@@ -32,7 +32,6 @@ class _DoaPageState extends State<SholatPage> {
       final matchKeyword =
           doa.judul.toLowerCase().contains(keyword.toLowerCase());
 
-      // Gunakan .contains() karena kategori berupa List<String>
       final matchCategory = selectedCategory == "Semua"
           ? true
           : doa.kategori.contains(selectedCategory);
@@ -52,7 +51,6 @@ class _DoaPageState extends State<SholatPage> {
       if (category == "Semua") {
         filteredDoa = doaList;
       } else {
-        // Gunakan .contains() juga di sini
         filteredDoa =
             doaList.where((e) => e.kategori.contains(category)).toList();
       }
@@ -65,8 +63,7 @@ class _DoaPageState extends State<SholatPage> {
       backgroundColor: const Color(0xff040C23),
       appBar: AppBar(
         backgroundColor: const Color(0xff040C23),
-        automaticallyImplyLeading:
-            false, // <-- TAMBAHKAN BARIS INI UNTUK HILANGKAN PANAH
+        automaticallyImplyLeading: false,
         elevation: 0,
         centerTitle: true,
         title: const Text(
@@ -78,104 +75,114 @@ class _DoaPageState extends State<SholatPage> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            /// SEARCH
-            TextField(
-              style: const TextStyle(
-                color: Colors.white,
-              ),
-              onChanged: searchDoa,
-              decoration: InputDecoration(
-                hintText: "Cari panduan & doa ibadah...",
-                hintStyle: const TextStyle(
-                  color: Color(0xffA19CC5),
-                ),
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(
-                      12.0), // Padding agar ukuran gambar pas
-                  child: Image.asset(
-                    'assets/search.png', // Sesuaikan dengan path aset kamu
-                    width: 20,
-                    height: 20,
+      body: Column(
+        children: [
+          // Jarak padding 24 kiri-kanan & atas tetap dipertahankan untuk Search & Category
+          Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24, top: 20),
+            child: Column(
+              children: [
+                /// SEARCH
+                TextField(
+                  style: const TextStyle(
+                    color: Colors.white,
                   ),
-                ),
-                filled: true,
-                fillColor: const Color(0xff040C23),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide:
-                        const BorderSide(color: Color(0xff672CBC), width: 2.5)),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(17),
-                    borderSide:
-                        const BorderSide(color: Color(0xff672CBC), width: 2.5)),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            /// CATEGORY
-            SizedBox(
-              height: 40,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  final cat = categories[index];
-                  final isActive = selectedCategory == cat;
-
-                  return GestureDetector(
-                    onTap: () => filterByCategory(cat),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 10),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isActive
-                            ? const Color(0xff672CBC)
-                            : const Color(0xff121931),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        cat,
-                        style: TextStyle(
-                          color:
-                              isActive ? Colors.white : const Color(0xffA19CC5),
-                          fontWeight: FontWeight.w500,
-                        ),
+                  onChanged: searchDoa,
+                  decoration: InputDecoration(
+                    hintText: "Cari panduan & doa ibadah...",
+                    hintStyle: const TextStyle(
+                      color: Color(0xffA19CC5),
+                    ),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Image.asset(
+                        'assets/search.png',
+                        width: 20,
+                        height: 20,
                       ),
                     ),
-                  );
-                },
-              ),
+                    filled: true,
+                    fillColor: const Color(0xff040C23),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 18, horizontal: 14),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        borderSide: const BorderSide(
+                            color: Color(0xff672CBC), width: 2.5)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(17),
+                        borderSide: const BorderSide(
+                            color: Color(0xff672CBC), width: 2.5)),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                /// CATEGORY
+                SizedBox(
+                  height: 40,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final cat = categories[index];
+                      final isActive = selectedCategory == cat;
+
+                      return GestureDetector(
+                        onTap: () => filterByCategory(cat),
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isActive
+                                ? const Color(0xff672CBC)
+                                : const Color(0xff121931),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            cat,
+                            style: TextStyle(
+                              color: isActive
+                                  ? Colors.white
+                                  : const Color(0xffA19CC5),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            /// LIST DOA
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredDoa.length,
-                itemBuilder: (context, index) {
-                  final doa = filteredDoa[index];
-
-                  return DoaTile(
-                    number: "${index + 1}",
-                    title: doa.judul,
-                    doa: doa,
-                  );
-                },
+          /// LIST DOA (Padding kiri, kanan, dan bawah dipindah ke sini)
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.only(
+                left: 24,
+                right: 24,
+                bottom: 24,
               ),
+              itemCount: filteredDoa.length,
+              itemBuilder: (context, index) {
+                final doa = filteredDoa[index];
+
+                return DoaTile(
+                  number: "${index + 1}",
+                  title: doa.judul,
+                  doa: doa,
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -232,7 +239,6 @@ class DoaTile extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              // Judul Doa
               child: Text(
                 title,
                 style: const TextStyle(

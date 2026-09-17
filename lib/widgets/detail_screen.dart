@@ -351,6 +351,7 @@ class _DetailScreenState extends State<DetailScreen> {
               color: const Color(0xffFFFFFF),
               fontWeight: FontWeight.bold,
               fontSize: 18,
+              height: 2.5,
             ),
             textAlign: TextAlign.right,
           ),
