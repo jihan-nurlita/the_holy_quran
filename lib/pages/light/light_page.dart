@@ -123,7 +123,7 @@ class LightPage extends StatelessWidget {
               subtitle: 'Atur font, tampilan, dan lainnya',
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
             /// FOOTER
             Center(
