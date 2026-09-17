@@ -69,7 +69,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(
-            top: 24,
+            top: 25,
             left: 24,
             right: 24,
             bottom: 24,
