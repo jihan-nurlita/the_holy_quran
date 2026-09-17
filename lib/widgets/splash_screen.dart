@@ -211,7 +211,7 @@ class _SplashScreenState extends State<SplashScreen> {
                             'assets/splash.png',
                             width: double.infinity,
                             height: double.infinity,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                             alignment: Alignment.bottomCenter,
                           ),
                         ),
