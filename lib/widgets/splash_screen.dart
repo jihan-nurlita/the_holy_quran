@@ -4,51 +4,84 @@ import 'package:the_holy_quran/navigation/main_navigation.dart';
 import 'package:the_holy_quran/utils/username_validator.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final _formkey = GlobalKey<FormState>();
-  final TextEditingController namecontroller = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController nameController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
-  bool isFocused = false;
-//
-  void dispose() {
-    _nameFocus.dispose();
-    namecontroller.dispose();
-    super.dispose();
-  }
 
-//
+  bool isFocused = false;
+
   @override
   void initState() {
     super.initState();
 
     _nameFocus.addListener(() {
+      if (!mounted) return;
+
       setState(() {
         isFocused = _nameFocus.hasFocus;
       });
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      FocusScope.of(context).requestFocus(_nameFocus);
+      if (mounted) {
+        FocusScope.of(context).requestFocus(_nameFocus);
+      }
     });
   }
 
   @override
+  void dispose() {
+    _nameFocus.dispose();
+    nameController.dispose();
+    super.dispose();
+  }
+
+  void _startLearning() {
+    if (_formKey.currentState!.validate()) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MainNavigation(
+            username: nameController.text.trim(),
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+
+    // Responsif berdasarkan tinggi layar.
+    final double topPadding = screenHeight < 700 ? 25 : 65;
+    final double headerSpacing = screenHeight < 700 ? 35 : 80;
+    final double inputToCardSpacing = screenHeight < 700 ? 30 : 55;
+
     return Scaffold(
-      // MENCEGAH KEYBOARD MENGGESER / MENDORONG LAYOUT DI ANDROID
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xff040C23),
       body: SafeArea(
         child: Padding(
-          padding:
-              const EdgeInsets.only(top: 65, left: 25, right: 25, bottom: 20),
+          padding: EdgeInsets.only(
+            top: topPadding,
+            left: 25,
+            right: 25,
+            bottom: 16,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // =========================
+              // HEADER
+              // =========================
               Row(
                 children: [
                   Text(
@@ -66,7 +99,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 5),
+
               Text(
                 'Selamat datang di Quran App',
                 style: GoogleFonts.poppins(
@@ -75,7 +110,12 @@ class _SplashScreenState extends State<SplashScreen> {
                   fontSize: 16,
                 ),
               ),
-              const SizedBox(height: 80),
+
+              SizedBox(height: headerSpacing),
+
+              // =========================
+              // DESCRIPTION
+              // =========================
               Text(
                 'Belajar Al-Qur’an jadi lebih mudah dan menyenangkan!',
                 style: GoogleFonts.poppins(
@@ -84,14 +124,19 @@ class _SplashScreenState extends State<SplashScreen> {
                   fontSize: 16,
                 ),
               ),
+
               const SizedBox(height: 13),
+
+              // =========================
+              // USERNAME
+              // =========================
               Form(
-                key: _formkey,
+                key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: TextFormField(
                   autofocus: true,
                   validator: UsernameValidator.validate,
-                  controller: namecontroller,
+                  controller: nameController,
                   textCapitalization: TextCapitalization.words,
                   focusNode: _nameFocus,
                   onTap: () {
@@ -104,88 +149,105 @@ class _SplashScreenState extends State<SplashScreen> {
                     color: const Color(0xffFFFFFF),
                   ),
                   decoration: InputDecoration(
-                      hintText: isFocused ? "" : "Masukan Username",
-                      prefixText: isFocused ? "Nama : " : null,
-                      fillColor: const Color(0xff040C23),
-                      filled: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 18, horizontal: 14),
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                              color: Color(0xff672CBC), width: 2.5)),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                              color: Color(0xff672CBC), width: 2.5)),
-                      hintStyle: GoogleFonts.poppins(
-                        color: const Color(0xffFFFFFF),
-                        fontWeight: FontWeight.w600,
-                      )),
-                ),
-              ),
-              const SizedBox(height: 55),
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 450,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: const Color(0xff672CBC),
+                    hintText: isFocused ? '' : 'Masukan Username',
+                    prefixText: isFocused ? 'Nama : ' : null,
+                    prefixStyle: GoogleFonts.poppins(
+                      color: const Color(0xffFFFFFF),
+                      fontWeight: FontWeight.w600,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 10, top: 5),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Image.asset(
-                          'assets/splash.png',
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
+                    fillColor: const Color(0xff040C23),
+                    filled: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 18,
+                      horizontal: 14,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(17),
+                      borderSide: const BorderSide(
+                        color: Color(0xff672CBC),
+                        width: 2.5,
                       ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(17),
+                      borderSide: const BorderSide(
+                        color: Color(0xff672CBC),
+                        width: 2.5,
+                      ),
+                    ),
+                    hintStyle: GoogleFonts.poppins(
+                      color: const Color(0xffFFFFFF),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Positioned(
-                    left: 0,
-                    top: -23,
-                    right: 0,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        if (_formkey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => MainNavigation(
-                                username: namecontroller.text.trim(),
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: Center(
+                ),
+              ),
+
+              SizedBox(height: inputToCardSpacing),
+
+              // =========================
+              // QURAN ILLUSTRATION
+              // =========================
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.topCenter,
+                    children: [
+                      Positioned.fill(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 16),
                           decoration: BoxDecoration(
-                            color: const Color(0xffF9B091),
                             borderRadius: BorderRadius.circular(30),
+                            color: const Color(0xff672CBC),
                           ),
-                          child: Text(
-                            'Mulai Belajar',
-                            style: GoogleFonts.poppins(
-                              color: const Color(0xff091945),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                          padding: const EdgeInsets.only(
+                            top: 38,
+                            bottom: 14,
+                            left: 12,
+                            right: 12,
+                          ),
+                          child: Image.asset(
+                            'assets/splash.png',
+                            width: double.infinity,
+                            height: double.infinity,
+                            fit: BoxFit.cover,
+                            alignment: Alignment.bottomCenter,
+                          ),
+                        ),
+                      ),
+
+                      // =========================
+                      // START BUTTON
+                      // =========================
+                      Positioned(
+                        top: -23,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _startLearning,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 36,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xffF9B091),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Text(
+                              'Mulai Belajar',
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xff091945),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  )
-                ],
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
