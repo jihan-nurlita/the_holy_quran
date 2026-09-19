@@ -69,10 +69,10 @@ class _SplashScreenState extends State<SplashScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(
-            top: 25,
+            top: 40,
             left: 24,
             right: 24,
-            bottom: 24,
+            bottom: 25,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,24 +147,33 @@ class _SplashScreenState extends State<SplashScreen> {
                     color: const Color(0xffFFFFFF),
                   ),
                   decoration: InputDecoration(
-                      hintText: isFocused ? "" : "Masukan Username",
-                      prefixText: isFocused ? "Nama : " : null,
-                      fillColor: const Color(0xff040C23),
-                      filled: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 18, horizontal: 14),
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                              color: Color(0xff672CBC), width: 2.5)),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                              color: Color(0xff672CBC), width: 2.5)),
-                      hintStyle: GoogleFonts.poppins(
-                        color: const Color(0xffFFFFFF),
-                        fontWeight: FontWeight.w600,
-                      )),
+                    hintText: isFocused ? "" : "Masukan Username",
+                    prefixText: isFocused ? "Nama : " : null,
+                    fillColor: const Color(0xff040C23),
+                    filled: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 18,
+                      horizontal: 14,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: const BorderSide(
+                        color: Color(0xff672CBC),
+                        width: 2.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: const BorderSide(
+                        color: Color(0xff672CBC),
+                        width: 2.5,
+                      ),
+                    ),
+                    hintStyle: GoogleFonts.poppins(
+                      color: const Color(0xffFFFFFF),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
 
@@ -220,8 +229,8 @@ class _SplashScreenState extends State<SplashScreen> {
                                   onTap: _startLearning,
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 36,
-                                      vertical: 14,
+                                      horizontal: 40,
+                                      vertical: 16,
                                     ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xffF9B091),
