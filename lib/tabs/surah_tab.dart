@@ -127,7 +127,7 @@ class _SurahTabState extends State<SurahTab> {
 // ✅ BADGE TERAKHIR DIBACA
                   if (isLastRead)
                     Container(
-                      margin: const EdgeInsets.only(left: 6),
+                      margin: const EdgeInsets.only(top: 4),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(

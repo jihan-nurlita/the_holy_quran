@@ -132,7 +132,6 @@ class _SplashScreenState extends State<SplashScreen> {
                 key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: TextFormField(
-                  autofocus: true,
                   validator: UsernameValidator.validate,
                   controller: nameController,
                   textCapitalization: TextCapitalization.words,
