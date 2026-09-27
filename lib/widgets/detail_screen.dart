@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:the_holy_quran/models/ayat.dart';
 import 'package:the_holy_quran/models/surah.dart';
@@ -33,7 +34,12 @@ class _DetailScreenState extends State<DetailScreen> {
   late final int surahNumber;
 
   late Future<Surah> _surahFuture;
-  final Map<int, GlobalKey> _ayatKeys = {};
+
+  // Controller untuk ScrollablePositionedList
+  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener =
+      ItemPositionsListener.create();
+
   int? lastAyat;
   bool _hasScrolled = false;
 
@@ -105,27 +111,39 @@ class _DetailScreenState extends State<DetailScreen> {
     final prefs = await SharedPreferences.getInstance();
 
     setState(() {
-      lastAyat = prefs.getInt('last_ayat_$surahNumber');
+      lastAyat = widget.lastAyat ?? prefs.getInt('last_ayat_$surahNumber');
       _hasScrolled = false;
     });
   }
 
-  void _scrollToLastAyatOnce() {
-    if (_hasScrolled) return;
-    if (lastAyat == null) return;
+  void _scrollToLastAyat(Surah surahData) {
+    if (_hasScrolled || lastAyat == null) return;
+    _hasScrolled = true;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final key = _ayatKeys[lastAyat!];
-      if (key?.currentContext != null) {
-        Scrollable.ensureVisible(
-          key!.currentContext!,
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeInOut,
-          alignment: 0.2,
-        );
-        _hasScrolled = true;
-      }
-    });
+    final listAyat = surahData.ayat;
+    if (listAyat == null || listAyat.isEmpty) return;
+
+    // Cari index ayat yang dituju di list
+    final targetAyatIndex =
+        listAyat.indexWhere((element) => element.nomor == lastAyat);
+
+    if (targetAyatIndex != -1) {
+      // Karena Index 0 diisi oleh Banner Header Surah,
+      // maka index posisi item ayat adalah targetAyatIndex + 1.
+      final targetItemIndex = targetAyatIndex + 1;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_itemScrollController.isAttached) {
+          _itemScrollController.scrollTo(
+            index: targetItemIndex,
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeInOutCubic,
+            alignment:
+                0.0, // <-- Diubah ke 0.0 agar posisinya pas rata di paling atas
+          );
+        }
+      });
+    }
   }
 
   Future<Surah> _getDetailSurah() async {
@@ -146,41 +164,42 @@ class _DetailScreenState extends State<DetailScreen> {
         }
         Surah surah = snapshot.data!;
 
-        if (!_hasScrolled &&
-            lastAyat != null &&
-            _ayatKeys.containsKey(lastAyat)) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _scrollToLastAyatOnce();
-          });
+        // Panggil auto scroll jika belum pernah di-scroll
+        if (!_hasScrolled && lastAyat != null) {
+          _scrollToLastAyat(surah);
         }
+
+        // Hitung total item (1 Header + Jumlah Ayat)
+        final int listAyatOffset = surahNumber == 1 ? 1 : 0;
+        final int totalAyatCount =
+            surah.jumlahAyat + (surahNumber == 1 ? -1 : 0);
+        final int totalItemCount =
+            totalAyatCount + 1; // +1 untuk header banner surah
 
         return Scaffold(
           backgroundColor: const Color(0xff040C23),
           appBar: _appBar(context: context, Surah: surah),
-          body: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) => [
-              SliverToBoxAdapter(
-                child: _details(surah: surah),
-              ),
-            ],
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: ListView.separated(
-                itemBuilder: (context, index) {
-                  final ayat =
-                      surah.ayat!.elementAt(index + (surahNumber == 1 ? 1 : 0));
-
-                  final ayatKey =
-                      _ayatKeys.putIfAbsent(ayat.nomor, () => GlobalKey());
-
-                  return _ayatItem(
-                    key: ayatKey,
-                    ayat: ayat,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: ScrollablePositionedList.builder(
+              itemScrollController: _itemScrollController,
+              itemPositionsListener: _itemPositionsListener,
+              itemCount: totalItemCount,
+              itemBuilder: (context, index) {
+                // Index 0 disajikan khusus untuk Banner/Header Surah
+                if (index == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _details(surah: surah),
                   );
-                },
-                itemCount: surah.jumlahAyat + (surahNumber == 1 ? -1 : 0),
-                separatorBuilder: (context, index) => const SizedBox.shrink(),
-              ),
+                }
+
+                // Index >= 1 disajikan untuk item ayat
+                final ayatIndex = (index - 1) + listAyatOffset;
+                final ayat = surah.ayat!.elementAt(ayatIndex);
+
+                return _ayatItem(ayat: ayat);
+              },
             ),
           ),
         );
@@ -188,12 +207,11 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-  Widget _ayatItem({required Key? key, required Ayat ayat}) {
+  Widget _ayatItem({required Ayat ayat}) {
     final bool isLastRead = ayat.nomor == lastAyat;
     final bool isPlaying = ayat.nomor == _playingAyat;
 
     return Padding(
-      key: key,
       padding: const EdgeInsets.only(top: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -361,7 +379,7 @@ class _DetailScreenState extends State<DetailScreen> {
             style: GoogleFonts.poppins(
               color: const Color(0xffA19CC5),
               fontWeight: FontWeight.w600,
-              fontSize: 16,
+              fontSize: 15,
             ),
           ),
         ],
@@ -369,102 +387,99 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-  Widget _details({required Surah surah}) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Stack(
-          children: [
-            Container(
-              height: 257,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xffDF98FA),
-                    Color(0xffB070FD),
-                    Color(0xff9055FF),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+  Widget _details({required Surah surah}) => Stack(
+        children: [
+          Container(
+            height: 257,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xffDF98FA),
+                  Color(0xffB070FD),
+                  Color(0xff9055FF),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Opacity(
-                opacity: .2,
-                child: Image.asset(
-                  'assets/quran.png',
-                  width: 324 - 55,
-                ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Opacity(
+              opacity: .2,
+              child: Image.asset(
+                'assets/quran.png',
+                width: 324 - 55,
               ),
             ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(28),
-              child: Column(
-                children: [
-                  Text(
-                    surah.namaLatin,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 26,
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              children: [
+                Text(
+                  surah.namaLatin,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 26,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  surah.arti,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
+                ),
+                Divider(
+                  color: Colors.white.withOpacity(.35),
+                  thickness: 2,
+                  height: 32,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      surah.tempatTurun.name,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    surah.arti,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
+                    const SizedBox(width: 5),
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(2),
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  Divider(
-                    color: Colors.white.withOpacity(.35),
-                    thickness: 2,
-                    height: 32,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        surah.tempatTurun.name,
-                        style: GoogleFonts.poppins(
+                    const SizedBox(width: 5),
+                    Text(
+                      "${surah.jumlahAyat} Ayat",
+                      style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Container(
-                        width: 4,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2),
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        "${surah.jumlahAyat} Ayat",
-                        style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-                  Image.asset(
-                    'assets/p.png',
-                    width: 240,
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
+                          fontSize: 12),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+                Image.asset(
+                  'assets/p.png',
+                  width: 240,
+                ),
+              ],
+            ),
+          )
+        ],
       );
 
   AppBar _appBar({required BuildContext context, required Surah Surah}) =>

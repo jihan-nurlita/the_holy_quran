@@ -90,7 +90,7 @@ class DetailSholatPage extends StatelessWidget {
               /// ARAB (LEBIH PREMIUM)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(22),
+                padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   color: const Color(0xff040C23),
                   borderRadius: BorderRadius.circular(20),
@@ -101,7 +101,7 @@ class DetailSholatPage extends StatelessWidget {
                     doa.arab,
                     textAlign: TextAlign.right,
                     style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 30,
+                      fontSize: 23,
                       height: 2.2,
                       fontWeight: FontWeight.w500,
                       color: Colors.white,
